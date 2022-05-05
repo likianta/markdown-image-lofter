@@ -1,0 +1,6 @@
+image_hosting:
+    sm.ms:
+        # references:
+        #   https://doc.sm.ms/
+        #   https://blog.csdn.net/qq_42951560/article/details/108618981
+        secret_token: ...

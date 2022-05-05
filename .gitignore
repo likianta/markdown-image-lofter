@@ -1,0 +1,11 @@
+/.idea/
+/data/
+/deleted/
+/lib/
+/tests/
+
+/config-test.yaml
+/test.py
+
+__pycache__
+*.pyc
