@@ -32,6 +32,7 @@ class DirtyHack:
     
     def get_image_boundary(self) -> tuple[int, int]:
         self._index += 1
+        if self._index == 0: print(':i0')
         print('get', self._boundary[self._index], ':vis')
         return self._boundary[self._index]
 
