@@ -1,20 +1,15 @@
-# specific version
-# ----------------
+# === specific version ===
 urllib3 < 1.26
 
+# === regular list ===
+argsense
 hot-shelve
 lk-logger
 lk-utils
 markdown-it-py
 pyyaml
 requests
-rich-click[typer]
 
-# unofficial
-# ----------
-git+https://github.com/likianta/rich-click-ext.git
-
-# not used
-# --------
+# === not used yet ===
 # lk-qtquick-scaffold
 # pyside6
