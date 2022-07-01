@@ -1,6 +1,3 @@
-# === specific version ===
-urllib3 < 1.26
-
 # === regular list ===
 argsense
 hot-shelve
@@ -9,6 +6,7 @@ lk-utils
 markdown-it-py
 pyyaml
 requests
+urllib3
 
 # === not used yet ===
 # lk-qtquick-scaffold

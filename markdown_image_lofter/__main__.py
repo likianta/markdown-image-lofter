@@ -8,7 +8,7 @@ from argsense import cli
 from lk_utils.filesniff import normpath
 from lk_utils.filesniff import relpath
 
-lk_logger.setup(show_varnames=True)
+lk_logger.setup(quiet=True, show_varnames=True)
 
 
 @cli.cmd()

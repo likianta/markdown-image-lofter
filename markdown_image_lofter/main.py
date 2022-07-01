@@ -70,7 +70,7 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
 
     # replace image holders
     # tip: replace from last to first (in reversed order)
-    doc_m = doc_i.splitlines()  # '_m' means 'modifying'
+    doc_m = doc_i.splitlines()  # '_m' means 'mediate state'
     for row_start in sorted(token_locations.keys(), reverse=True):
         for (col_start, col_end) in sorted(
                 token_locations[row_start], key=lambda x: x[0], reverse=True
@@ -83,7 +83,7 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
             )
     doc_o = '\n'.join(doc_m)
     dumps(doc_o, file_o)
-    print('see output at {}'.format(file_o))
+    print('see output at [green]{}[/]'.format(file_o), ':rv2')
     
     database.close()
 
