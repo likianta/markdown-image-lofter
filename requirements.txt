@@ -3,7 +3,6 @@ argsense
 hot-shelve
 lk-logger
 lk-utils
-markdown-it-py
 pyyaml
 requests
 urllib3

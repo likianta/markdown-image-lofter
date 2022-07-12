@@ -8,7 +8,8 @@ from lk_utils import loads
 from lk_utils import relpath
 from lk_utils.filesniff import normpath
 
-from .extractor import extract_image_urls
+# from .extractor import extract_image_urls
+from .extractor2 import extract_image_urls
 from .uploader import Uploader
 
 
@@ -30,6 +31,7 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
     
     database = FlatShelve(relpath('../data/uploaded_images.db'))
     config = loads(config_path)
+    # noinspection PyTypeChecker
     uploader = Uploader(token=config['image_hosting']['sm.ms']['secret_token'])
     
     token_locations = defaultdict(list)
