@@ -68,7 +68,7 @@ def extract_image_urls(doc: str) -> Iterator[
             print(':v', target.text, img_pattern.match(target.text))
             if match := img_pattern.match(target.text):
                 alt, src, title = (x or '' for x in match.groups())
-                print(':v2i', target.text, alt, src, title)
+                print(':lv2i', target.text, alt, src, title)
                 yield (
                     (target.span.start_rowx, target.span.end_rowx),
                     (target.span.start_colx, target.span.end_colx),

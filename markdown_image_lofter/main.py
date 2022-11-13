@@ -85,7 +85,7 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
             )
     doc_o = '\n'.join(doc_m)
     dumps(doc_o, file_o)
-    print('see output at [green]{}[/]'.format(file_o), ':rv2')
+    print('see output at [green]{}[/]'.format(file_o), ':rv2t')
     
     database.close()
 

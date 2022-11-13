@@ -6,7 +6,7 @@ import os.path
 import lk_logger
 from argsense import cli
 from lk_utils.filesniff import normpath
-from lk_utils.filesniff import relpath
+from lk_utils.filesniff import xpath
 
 lk_logger.setup(quiet=True, show_varnames=True)
 
@@ -33,7 +33,7 @@ def main(filepath: str, dir_o: str = None, config: str = None):
     if config:
         config = normpath(config, force_abspath=True)
     else:
-        config = relpath('../config.yaml')
+        config = xpath('../config.yaml')
     if dir_o:
         dir_o = normpath(dir_o, force_abspath=True)
     else:
