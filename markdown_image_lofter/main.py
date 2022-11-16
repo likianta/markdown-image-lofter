@@ -5,7 +5,7 @@ from collections import defaultdict
 from hot_shelve import FlatShelve
 from lk_utils import dumps
 from lk_utils import loads
-from lk_utils import relpath
+from lk_utils import xpath
 from lk_utils.filesniff import normpath
 
 # from .extractor import extract_image_urls
@@ -14,7 +14,7 @@ from .uploader import Uploader
 
 
 def main(file_i: str, file_o: str = None, overwrite_exists=True,
-         config_path=None):
+         config_path=None, full_upload=False):
     """
     extract images from `file_i`, upload them, then replace them with urls,
     finally write the result to `file_o`.
@@ -24,12 +24,15 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
     if not overwrite_exists and os.path.exists(file_o):
         raise FileExistsError(f'{file_o} already exists!')
     if not config_path:
-        config_path = relpath('../config.yaml')
+        config_path = xpath('../config.yaml')
     
     dir_i = os.path.dirname(file_i)
     doc_i = loads(file_i)
     
-    database = FlatShelve(relpath('../data/uploaded_images.db'))
+    if full_upload:
+        database = {}
+    else:
+        database = FlatShelve(xpath('../data/uploaded_images.db'))
     config = loads(config_path)
     # noinspection PyTypeChecker
     uploader = Uploader(token=config['image_hosting']['sm.ms']['secret_token'])
@@ -81,13 +84,14 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
             doc_m[row_start] = '{}{}{}'.format(
                 doc_m[row_start][:col_start],
                 '![]({})'.format(image_urls[(row_start, col_start)]),
-                doc_m[row_start][col_end:]
+                doc_m[row_start][col_end + 1:]
             )
     doc_o = '\n'.join(doc_m)
     dumps(doc_o, file_o)
     print('see output at [green]{}[/]'.format(file_o), ':rv2t')
     
-    database.close()
+    if isinstance(database, FlatShelve):
+        database.close()
 
 
 def get_file_hash(filepath: str):
