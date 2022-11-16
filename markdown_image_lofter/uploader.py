@@ -62,8 +62,14 @@ class Uploader:
                         'RequestId': '...'
                     }
             '''
-        if r.json()['success']:
-            return r.json()['data']
+        
+        json_ = r.json()
+        if json_['success']:
+            return json_['data']
+        elif json_['code'] == 'image_repeated':
+            print(':v3p', 'image repeated but upload succeed')
+            # print(':v', json_['images'])
+            return {'url': json_['images']}
         else:
-            print(r.json(), ':v4lp')
-            raise Exception(r.json()['message'])
+            print(json_, ':v4lp')
+            raise Exception(json_['message'])
