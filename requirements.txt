@@ -3,7 +3,9 @@ argsense
 hot-shelve
 lk-logger
 lk-utils
+oss2
 pyyaml
+qiniu
 requests
 urllib3
 

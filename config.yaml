@@ -1,6 +1,23 @@
 image_hosting:
-    sm.ms:
-        # references:
-        #   https://doc.sm.ms/
-        #   https://blog.csdn.net/qq_42951560/article/details/108618981
-        secret_token: ...
+  name: str  # aliyun, qiniu, sm.ms
+  kwargs: dict
+  _comment: |
+    for aliyun:
+      kwargs:
+        access_key: str
+        secret_key: str
+        bucket_name: str
+        endpoint: str
+    for qiniu:
+      kwargs:
+        access_key: str
+        secret_key: str
+        bucket_name: str
+        domain_name: str
+    for sm.ms:
+      kwargs:
+        secret_key: str
+    
+    references:
+      https://doc.sm.ms/
+      https://blog.csdn.net/qq_42951560/article/details/108618981

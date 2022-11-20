@@ -8,27 +8,34 @@ ref:
 """
 import requests
 
+from ._interface import Uploader
+from ..util import get_file_hash
 
-class Uploader:
+
+class SmMsUploader(Uploader):
     
-    def __init__(self, token: str):
+    def __init__(self, secret_key: str, full_upload=False):
         """
         args:
             token: the api token.
                 1. login to sm.ms
                 2. visit 'dashboar' - 'api token'
                 3. click 'generate secret token'
-            
-        
         """
-        self.url = 'https://sm.ms/api/v2/upload'
-        self._header = {'Authorization': token}
+        super().__init__('sm_ms.db', full_upload)
+        self._url = 'https://sm.ms/api/v2/upload'
+        self._header = {'Authorization': secret_key}
     
-    def upload(self, filepath: str) -> dict:
+    def upload(self, filepath: str) -> str:
+        hash_ = get_file_hash(filepath)
+        if x := self._db.get(hash_):
+            return x['url']
         with open(filepath, 'rb') as f:
-            r = requests.post(self.url,
-                              files={'smfile': f},
-                              headers=self._header)
+            r = requests.post(
+                self._url,
+                files={'smfile': f},
+                headers=self._header
+            )
             # print(r.status_code, r.json(), ':ipl')
             '''
             r.json() -> dict
@@ -65,11 +72,12 @@ class Uploader:
         
         json_ = r.json()
         if json_['success']:
-            return json_['data']
+            self._db[hash_] = json_['data']
+            return json_['data']['url']
         elif json_['code'] == 'image_repeated':
             print(':v3p', 'image repeated but upload succeed')
-            # print(':v', json_['images'])
-            return {'url': json_['images']}
+            self._db[hash_] = {'url': json_['images']}
+            return json_['images']
         else:
             print(json_, ':v4lp')
             raise Exception(json_['message'])

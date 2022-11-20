@@ -1,23 +1,23 @@
-import hashlib
 import os.path
 from collections import defaultdict
 
-from hot_shelve import FlatShelve
 from lk_utils import dumps
 from lk_utils import loads
 from lk_utils import xpath
 from lk_utils.filesniff import normpath
 
-# from .extractor import extract_image_urls
 from .extractor2 import extract_image_urls
-from .uploader import Uploader
+from .uploader import get_uploader
 
 
 def main(file_i: str, file_o: str = None, overwrite_exists=True,
-         config_path=None, full_upload=False):
+         config_path=None, full_upload=False, html_tag_format=False):
     """
     extract images from `file_i`, upload them, then replace them with urls,
     finally write the result to `file_o`.
+    
+    args:
+        html_tag_format: use `<img src="...">` instead of `![...](...)`.
     """
     if not file_o:
         file_o = file_i.rsplit('.', 1)[0] + '.export.md'
@@ -29,13 +29,12 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
     dir_i = os.path.dirname(file_i)
     doc_i = loads(file_i)
     
-    if full_upload:
-        database = {}
-    else:
-        database = FlatShelve(xpath('../data/uploaded_images.db'))
     config = loads(config_path)
-    # noinspection PyTypeChecker
-    uploader = Uploader(token=config['image_hosting']['sm.ms']['secret_token'])
+    uploader = get_uploader(
+        config['image_hosting']['name'],
+        config['image_hosting']['kwargs'],
+        full_upload=full_upload,
+    )
     
     token_locations = defaultdict(list)
     #   {int row: [(int col_start, int col_end), ...]}
@@ -62,48 +61,32 @@ def main(file_i: str, file_o: str = None, overwrite_exists=True,
             filepath = normpath(src)
         else:
             filepath = normpath(f'{dir_i}/{src}', force_abspath=True)
-        hash_ = get_file_hash(filepath)
-        if hash_ in database:
-            print('reuse cache', src, ':v')
-            url = image_urls[(row_start, col_start)] = database[hash_]['url']
-        else:
-            print('uploading', src)
-            data = uploader.upload(filepath)
-            database[hash_] = data
-            url = image_urls[(row_start, col_start)] = data['url']
-        print(src, hash_, url, ':v2')
-
-    # replace image holders
-    # tip: replace from last to first (in reversed order)
-    doc_m = doc_i.splitlines()  # '_m' means 'mediate state'
-    for row_start in sorted(token_locations.keys(), reverse=True):
-        for (col_start, col_end) in sorted(
-                token_locations[row_start], key=lambda x: x[0], reverse=True
-        ):
-            print(row_start, col_start, col_end, ':v')
-            doc_m[row_start] = '{}{}{}'.format(
-                doc_m[row_start][:col_start],
-                '![]({})'.format(image_urls[(row_start, col_start)]),
-                doc_m[row_start][col_end + 1:]
-            )
-    doc_o = '\n'.join(doc_m)
+        link = uploader.upload(filepath)
+        image_urls[(row_start, col_start)] = link
+        print(f'{src} -> {link}', ':v2')
+    
+    # -------------------------------------------------------------------------
+    
+    def replace_image_holders() -> str:
+        # tip: replace from last to first (in reversed order)
+        doc_m = doc_i.splitlines()  # '_m' means 'mediate state'
+        for row_start in sorted(token_locations.keys(), reverse=True):
+            for (col_start, col_end) in sorted(
+                    token_locations[row_start], key=lambda x: x[0], reverse=True
+            ):
+                print(row_start, col_start, col_end, ':v')
+                head, tail = (
+                    doc_m[row_start][:col_start],
+                    doc_m[row_start][col_end + 1:]
+                )
+                url = image_urls[(row_start, col_start)]
+                if html_tag_format:
+                    body = f'<img src="{url}">'
+                else:
+                    body = f'![]({url})'
+                doc_m[row_start] = head + body + tail
+        return '\n'.join(doc_m)
+    
+    doc_o = replace_image_holders()
     dumps(doc_o, file_o)
     print('see output at [green]{}[/]'.format(file_o), ':rv2t')
-    
-    if isinstance(database, FlatShelve):
-        database.close()
-
-
-def get_file_hash(filepath: str):
-    """
-    https://blog.csdn.net/qq_26373925/article/details/115409308
-    
-    note: if file is too big, read the first 8192 bytes.
-    """
-    with open(filepath, 'rb') as file:
-        md5 = hashlib.md5()
-        if os.path.getsize(filepath) > 3 * 1024 * 1024:
-            md5.update(filepath.encode('utf-8') + file.read(8192))
-        else:
-            md5.update(filepath.encode('utf-8') + file.read())
-    return md5.hexdigest()

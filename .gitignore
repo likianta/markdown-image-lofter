@@ -1,8 +1,9 @@
 /.idea/
-/data/
+/data/*
 /deleted/
 /lib/
 /tests/
+/.qiniu_pythonsdk_hostscache.json
 __pycache__/
 
 /config-test.yaml
@@ -10,3 +11,5 @@ __pycache__/
 
 .DS_Store
 *.pyc
+
+!/data/.gitkeep
