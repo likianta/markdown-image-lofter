@@ -75,9 +75,9 @@ class SmMsUploader(Uploader):
             self._db[hash_] = json_['data']
             return json_['data']['url']
         elif json_['code'] == 'image_repeated':
-            print(':v3p', 'image repeated but upload succeed')
+            print(':v6p', 'image repeated but upload succeed')
             self._db[hash_] = {'url': json_['images']}
             return json_['images']
         else:
-            print(json_, ':v4lp')
+            print(json_, ':v8lp')
             raise Exception(json_['message'])

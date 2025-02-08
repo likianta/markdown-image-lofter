@@ -2,6 +2,7 @@ import typing as t
 from os.path import basename
 from time import time
 
+from lk_utils import timestamp
 from oss2 import Auth
 from oss2 import Bucket
 
@@ -40,11 +41,12 @@ class AliyunOssUploader(Uploader):
     
     def upload(self, filepath: str) -> str:
         name = basename(filepath)
-        hash_ = get_file_hash(filepath)
+        hash = get_file_hash(filepath)
+        link = '{}/{}'.format(timestamp('y-m'), name)
         
         if not self._is_full_upload:
             model: T.Model
-            if model := self._db.get(hash_):
+            if model := self._db.get(hash):
                 now = int(time())
                 if model['temp_url_expires'] < now:
                     print('refresh temp url')
@@ -57,19 +59,14 @@ class AliyunOssUploader(Uploader):
                     print('use cached temp url')
                 return model['temp_url']
         
-        self._bucket.put_object_from_file(
-            name, filepath,
-            # progress_callback=partial(
-            #     self._update_progress, f'uploading {name}'
-            # )
-        )
-        print(f'upload done ({name})')
+        self._bucket.put_object_from_file(link, filepath)
+        print('upload done', link)
         
-        self._db[hash_] = {
-            'id'              : hash_,
+        self._db[hash] = {
+            'id'              : hash,
             'name'            : name,
-            'url'             : name,
-            'temp_url'        : (out := self.make_link(name, self.expires)),
+            'url'             : link,
+            'temp_url'        : (out := self.make_link(link, self.expires)),
             'temp_url_expires': int(time()) + self.expires,
         }
         self._db.sync()

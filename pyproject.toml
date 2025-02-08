@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "markdown-image-lofter"
+version = "0.1.0"
+description = ""
+authors = ["likianta <likianta@foxmail.com>"]
+# readme = "README.md"
+packages = [{ include = "markdown_image_lofter" }]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+argsense = { version = "^0.6.0b7", source = "likianta-host" }
+hot-shelve = "^0.1.2"
+lk-logger = { version = "^6.0.3", source = "likianta-host" }
+lk-utils = { version = "^3.1.2a5", source = "likianta-host" }
+oss2 = "^2.19.1"
+pyyaml = "^6.0.2"
+qiniu = "^7.15.0"
+requests = "^2.32.3"
+urllib3 = "^2.2.3"
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "likianta-host"
+url = "http://likianta.pro:2131/"
+priority = "supplemental"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
